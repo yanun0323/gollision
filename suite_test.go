@@ -66,7 +66,7 @@ var (
 	}
 )
 
-func (s *GollisionSuite) TestIntegration() {
+func (su *GollisionSuite) TestIntegration() {
 	sp := NewSpace()
 
 	player := Type(0)
@@ -76,30 +76,43 @@ func (s *GollisionSuite) TestIntegration() {
 	body2 := NewBody(&sp, NewBitmap2D(img2.W, img2.H, img2.Vectors()...), monster, 0, 0)
 	body3 := NewBody(&sp, NewBitmap2D(img3.W, img3.H, img3.Vectors()...), monster, 0, 0)
 
-	sp.Update()
-
-	debug("Body1 Hit", body1.GetCollided())
-	debug("Body2 Hit", body2.GetCollided())
-	debug("Body3 Hit", body3.GetCollided())
-
-	println()
-	body1.UpdatePosition(Vector{X: 1})
-	sp.Update()
-
-	debug("Body1 Hit", body1.GetCollided())
-	debug("Body2 Hit", body2.GetCollided())
-	debug("Body3 Hit", body3.GetCollided())
-}
-
-func debug(prefix string, obj []Body) {
-	print(prefix)
-	for _, o := range obj {
-		print(" ")
-		print(o.ID())
+	testCases := []struct {
+		Name                string
+		Body1Move           Vector
+		ExpectCollidedCount [3]int
+	}{
+		{
+			"Start",
+			Vector{},
+			[3]int{1, 1, 0},
+		},
+		{
+			"move right",
+			Vector{X: 1},
+			[3]int{1, 0, 1},
+		},
+		{
+			"move left",
+			Vector{X: -1},
+			[3]int{1, 1, 0},
+		},
+		{
+			"move up",
+			Vector{Y: -1},
+			[3]int{2, 1, 1},
+		},
+		{
+			"move bottom",
+			Vector{Y: 1},
+			[3]int{1, 1, 0},
+		},
 	}
-	if len(obj) == 0 {
-		print(" ")
-		print("nothing")
+
+	for _, tc := range testCases {
+		body1.UpdatePosition(tc.Body1Move)
+		sp.Update()
+		su.Equal(tc.ExpectCollidedCount[0], len(body1.GetCollided()), "%s: %d", tc.Name, 1)
+		su.Equal(tc.ExpectCollidedCount[1], len(body2.GetCollided()), "%s: %d", tc.Name, 2)
+		su.Equal(tc.ExpectCollidedCount[2], len(body3.GetCollided()), "%s: %d", tc.Name, 3)
 	}
-	println("")
 }

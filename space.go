@@ -66,12 +66,9 @@ func (s *space) calculateCollided() {
 		queue = append(queue, b)
 		return true
 	})
-	println("queue:", len(queue))
 	for i := 0; i < len(queue); i++ {
 		a := queue[i]
 		aID := a.ID()
-		v := a.UpdatePosition(Vector{})
-		println("Body ID:", aID, "X:", v.X, "Y:", v.Y, "Bitmap:", a.PositionedBitmap().Bitmap()[2])
 		for j := i + 1; j < len(queue); j++ {
 			b := queue[j]
 			bID := b.ID()

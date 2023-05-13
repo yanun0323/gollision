@@ -90,9 +90,9 @@ func (bm *bitmap2D) Offset(x, y int) Bitmap2D {
 
 	for i := range temp {
 		if x >= 0 {
-			m[i+y] = bm.m[i] << x
+			m[i+y] = temp[i] << x
 		} else {
-			m[i+y] = bm.m[i] >> abs(x)
+			m[i+y] = temp[i] >> abs(x)
 		}
 	}
 	return &bitmap2D{
