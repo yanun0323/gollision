@@ -1,4 +1,4 @@
-module gollision
+module github.com/yanun0323/gollision
 
 go 1.20
 
