@@ -14,13 +14,13 @@ func (v Vector) Add(offset Vector) Vector {
 
 type body struct {
 	id uint64
-	s  *space
+	s  *Space
 	t  Type
 	bm Bitmap2D
 	v  Vector
 }
 
-func NewBody(s *space, bm Bitmap2D, t Type, x, y int) Body {
+func NewBody(s *Space, bm Bitmap2D, t Type, x, y int) Body {
 	b := &body{
 		id: s.NextID(),
 		s:  s,

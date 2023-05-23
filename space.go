@@ -8,7 +8,7 @@ import (
 
 type idSet = gollection.Set[uint64]
 
-type space struct {
+type Space struct {
 	lastBodyIDLock sync.Mutex
 	lastBodyID     uint64
 
@@ -17,8 +17,8 @@ type space struct {
 	bodyMap gollection.SyncMap[uint64, Body]
 }
 
-func NewSpace() space {
-	return space{
+func NewSpace() Space {
+	return Space{
 		lastBodyIDLock: sync.Mutex{},
 		lastBodyID:     0,
 		collidedMap:    map[uint64]idSet{},
@@ -26,26 +26,26 @@ func NewSpace() space {
 	}
 }
 
-func (s *space) Update() {
+func (s *Space) Update() {
 	s.calculateCollided()
 }
 
-func (s *space) NextID() uint64 {
+func (s *Space) NextID() uint64 {
 	s.lastBodyIDLock.Lock()
 	defer s.lastBodyIDLock.Unlock()
 	s.lastBodyID++
 	return s.lastBodyID
 }
 
-func (s *space) AddBody(b Body) {
+func (s *Space) AddBody(b Body) {
 	s.bodyMap.Store(b.ID(), b)
 }
 
-func (s *space) RemoveBody(id uint64, t Type) {
+func (s *Space) RemoveBody(id uint64, t Type) {
 	s.bodyMap.Delete(id)
 }
 
-func (s *space) GetCollided(id uint64) []Body {
+func (s *Space) GetCollided(id uint64) []Body {
 	m, ok := s.collidedMap[id]
 	if !ok {
 		return []Body{}
@@ -59,7 +59,7 @@ func (s *space) GetCollided(id uint64) []Body {
 	return bodies
 }
 
-func (s *space) calculateCollided() {
+func (s *Space) calculateCollided() {
 	s.collidedMap = map[uint64]idSet{}
 	var queue []Body
 	s.bodyMap.Range(func(key uint64, b Body) bool {
