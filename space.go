@@ -6,9 +6,18 @@ import (
 	"github.com/yanun0323/gollection/v2"
 )
 
+type Space interface {
+	Update()
+	GetCollided(id uint64) []Body
+
+	nextID() uint64
+	addBody(b Body)
+	removeBody(id uint64, t Type)
+}
+
 type idSet = gollection.Set[uint64]
 
-type Space struct {
+type space struct {
 	lastBodyIDLock sync.Mutex
 	lastBodyID     uint64
 
@@ -18,7 +27,7 @@ type Space struct {
 }
 
 func NewSpace() Space {
-	return Space{
+	return &space{
 		lastBodyIDLock: sync.Mutex{},
 		lastBodyID:     0,
 		collidedMap:    map[uint64]idSet{},
@@ -26,26 +35,11 @@ func NewSpace() Space {
 	}
 }
 
-func (s *Space) Update() {
+func (s *space) Update() {
 	s.calculateCollided()
 }
 
-func (s *Space) NextID() uint64 {
-	s.lastBodyIDLock.Lock()
-	defer s.lastBodyIDLock.Unlock()
-	s.lastBodyID++
-	return s.lastBodyID
-}
-
-func (s *Space) AddBody(b Body) {
-	s.bodyMap.Store(b.ID(), b)
-}
-
-func (s *Space) RemoveBody(id uint64, t Type) {
-	s.bodyMap.Delete(id)
-}
-
-func (s *Space) GetCollided(id uint64) []Body {
+func (s *space) GetCollided(id uint64) []Body {
 	m, ok := s.collidedMap[id]
 	if !ok {
 		return []Body{}
@@ -59,7 +53,22 @@ func (s *Space) GetCollided(id uint64) []Body {
 	return bodies
 }
 
-func (s *Space) calculateCollided() {
+func (s *space) nextID() uint64 {
+	s.lastBodyIDLock.Lock()
+	defer s.lastBodyIDLock.Unlock()
+	s.lastBodyID++
+	return s.lastBodyID
+}
+
+func (s *space) addBody(b Body) {
+	s.bodyMap.Store(b.ID(), b)
+}
+
+func (s *space) removeBody(id uint64, t Type) {
+	s.bodyMap.Delete(id)
+}
+
+func (s *space) calculateCollided() {
 	s.collidedMap = map[uint64]idSet{}
 	var queue []Body
 	s.bodyMap.Range(func(key uint64, b Body) bool {
@@ -76,7 +85,18 @@ func (s *Space) calculateCollided() {
 				continue
 			}
 
-			if a.PositionedBitmap().And(b.PositionedBitmap()).IsZero() {
+			aBm := a.positionedBitmap()
+			if aBm.isEmpty() {
+				continue
+			}
+
+			bBm := b.positionedBitmap()
+			if bBm.isEmpty() {
+				continue
+			}
+
+			jBm := aBm.and(bBm)
+			if jBm.isEmpty() {
 				continue
 			}
 

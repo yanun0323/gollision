@@ -1,34 +1,34 @@
 package gollision
 
+type Body interface {
+	ID() uint64
+	Type() Type
+	SetPosition(x, y int)
+	UpdatePosition(dx, dy int) (x, y int)
+	UpdateBitmap(h, w int, image [][]uint8) error
+	GetCollided() []Body
+
+	positionedBitmap() bitmap
+}
+
 type Type uint64
 
-type Vector struct {
-	X, Y int
-}
-
-func (v Vector) Add(offset Vector) Vector {
-	v.X += offset.X
-	v.Y += offset.Y
-	return v
-}
-
 type body struct {
-	id uint64
-	s  *Space
-	t  Type
-	bm Bitmap2D
-	v  Vector
+	id   uint64
+	s    Space
+	t    Type
+	bm   bitmap
+	x, y int
 }
 
-func NewBody(s *Space, bm Bitmap2D, t Type, x, y int) Body {
+func NewBody(s Space, t Type) Body {
 	b := &body{
-		id: s.NextID(),
+		id: s.nextID(),
 		s:  s,
 		t:  t,
-		bm: bm,
-		v:  Vector{X: x, Y: y},
 	}
-	s.AddBody(b)
+
+	s.addBody(b)
 	return b
 }
 
@@ -39,26 +39,32 @@ func (b body) ID() uint64 {
 func (b body) Type() Type {
 	return b.t
 }
-
-func (b *body) Bitmap() Bitmap2D {
-	return b.bm
+func (b *body) SetPosition(x, y int) {
+	b.x = x
+	b.y = y
+}
+func (b *body) UpdatePosition(dx, dy int) (x, y int) {
+	b.x = x + dx
+	b.y = y + dy
+	return b.x, b.y
 }
 
-func (b *body) PositionedBitmap() Bitmap2D {
-	return b.bm.Offset(b.v.X, b.v.Y)
-}
-func (b *body) SetPosition(v Vector) {
-	b.v = v
-}
-func (b *body) UpdatePosition(offset Vector) Vector {
-	b.v = b.v.Add(offset)
-	return b.v
-}
-
-func (b *body) UpdateBitmap(bm Bitmap2D) {
+func (b *body) UpdateBitmap(h, w int, image [][]uint8) error {
+	bm, err := newBitmap(h, w, image)
+	if err != nil {
+		return err
+	}
 	b.bm = bm
+	return nil
 }
 
 func (b *body) GetCollided() []Body {
 	return b.s.GetCollided(b.id)
+}
+
+func (b *body) positionedBitmap() bitmap {
+	if b.bm.isEmpty() {
+		return bitmap{}
+	}
+	return b.bm.offset(b.x, b.y)
 }
