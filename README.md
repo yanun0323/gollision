@@ -13,21 +13,21 @@ space := NewSpace()
 
 // Create body
 CollisionType := gollision.Type(1)
-bodyA := NewBody(space, CollisionType)
+body := NewBody(space, CollisionType)
 
 // Update body image
 imageData := [][]uint8{...}
-bodyA.UpdateBitmap(imageHeight, imageWidth, imageData)
+body.UpdateBitmap(imageHeight, imageWidth, imageData)
 
 // Update body position
-bodyA.SetPosition(10, 10) /* Change position to (10, 10) */
-bodyA.AddPosition(10, 10) /* Change position to (origin x + 10, origin y + 10) */
+body.SetPosition(10, 10) /* Change position to (10, 10) */
+body.AddPosition(10, 10) /* Change position to (origin x + 10, origin y + 10) */
 
 // Calculate body collisions in the space
 space.Update()
 
 // Get the other bodies colliding with this body
-collided := bodyA.GetCollided() 
-collided := space.GetCollided(bodyA.ID())
+collided := body.GetCollided() 
+collided := space.GetCollided(body.ID())
 
 ```
