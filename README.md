@@ -21,7 +21,7 @@ bodyA.UpdateBitmap(imageHeight, imageWidth, imageData)
 
 // Update body position
 bodyA.SetPosition(10, 10) /* Change position to (10, 10) */
-bodyA.AddPosition(10, 10) /* Change position to (originalX + 10, originalY + 10) */
+bodyA.AddPosition(10, 10) /* Change position to (origin x + 10, origin y + 10) */
 
 // Calculate body collisions in the space
 space.Update()
