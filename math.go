@@ -1,32 +1,32 @@
 package gollision
 
-type UnsignedInteger interface {
+type unsignedInteger interface {
 	uint8 | uint16 | uint32 | uint64 | uint
 }
 
-type SignedInteger interface {
+type signedInteger interface {
 	int8 | int16 | int32 | int64 | int
 }
 
-type Integer interface {
-	UnsignedInteger | SignedInteger
+type integer interface {
+	unsignedInteger | signedInteger
 }
 
-func max[T Integer](a, b T) T {
+func max[T integer](a, b T) T {
 	if a > b {
 		return a
 	}
 	return b
 }
 
-func min[T Integer](a, b T) T {
+func min[T integer](a, b T) T {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func abs[T Integer](x T) T {
+func abs[T integer](x T) T {
 	if x < 0 {
 		return -x
 	}

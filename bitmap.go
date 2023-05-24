@@ -6,9 +6,9 @@ type bitmap struct {
 	empty bool
 }
 
-func newBitmap(h, w int, data [][]uint8) bitmap {
+func newBitmap(h, w int, data [][]uint8) *bitmap {
 	if w == 0 {
-		return bitmap{}
+		return emptyBitmap()
 	}
 
 	m := make([]uint64, h)
@@ -24,27 +24,31 @@ func newBitmap(h, w int, data [][]uint8) bitmap {
 		}
 	}
 
-	return bitmap{
+	return &bitmap{
 		w: w,
 		h: h,
 		m: m,
 	}
 }
 
-func (bm bitmap) and(in bitmap) bitmap {
+func emptyBitmap() *bitmap {
+	return &bitmap{m: []uint64{}, empty: true}
+}
+
+func (bm *bitmap) and(in *bitmap) *bitmap {
 	minH := min(bm.h, in.h)
 	m := make([]uint64, minH)
 	for i := 0; i < minH; i++ {
 		m[i] = bm.m[i] & in.m[i]
 	}
-	return bitmap{
+	return &bitmap{
 		w: min(bm.w, in.w),
 		h: minH,
 		m: m,
 	}
 }
 
-func (bm bitmap) or(in bitmap) bitmap {
+func (bm *bitmap) or(in *bitmap) *bitmap {
 	higher := in
 	if in.h > bm.h {
 		higher = bm
@@ -60,18 +64,18 @@ func (bm bitmap) or(in bitmap) bitmap {
 		}
 		m[i] = higherMap[i]
 	}
-	return bitmap{
+	return &bitmap{
 		w: max(bm.w, in.w),
 		h: higher.h,
 		m: m,
 	}
 }
 
-func (bm bitmap) offset(x, y int) bitmap {
+func (bm *bitmap) offset(x, y int) *bitmap {
 	w := bm.w + x
 	h := bm.h + y
 	if w <= 0 || h <= 0 {
-		return bitmap{}
+		return emptyBitmap()
 	}
 
 	temp := bm.m
@@ -88,7 +92,7 @@ func (bm bitmap) offset(x, y int) bitmap {
 			m[i+y] = temp[i] >> abs(x)
 		}
 	}
-	return bitmap{
+	return &bitmap{
 		w: w,
 		h: h,
 		m: m,

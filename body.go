@@ -24,7 +24,7 @@ type Body interface {
 	GetCollided() []Body
 
 	// Return the bitmap witch added the position offset of this body
-	positionedBitmap() bitmap
+	positionedBitmap() *bitmap
 }
 
 type Type uint8
@@ -33,7 +33,7 @@ type body struct {
 	id   uint64
 	s    Space
 	t    Type
-	bm   bitmap
+	bm   *bitmap
 	x, y int
 }
 
@@ -79,9 +79,9 @@ func (b *body) GetCollided() []Body {
 	return b.s.GetCollided(b.id)
 }
 
-func (b *body) positionedBitmap() bitmap {
+func (b *body) positionedBitmap() *bitmap {
 	if b.bm.isEmpty() {
-		return bitmap{}
+		return emptyBitmap()
 	}
 	return b.bm.offset(b.x, b.y)
 }
