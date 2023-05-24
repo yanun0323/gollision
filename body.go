@@ -1,13 +1,26 @@
 package gollision
 
 type Body interface {
+	// The ID of body
 	ID() uint64
+
+	// The type of body
 	Type() Type
+
+	// It will change position to (x, y).
 	SetPosition(x, y int)
-	UpdatePosition(dx, dy int) (x, y int)
+
+	// It will change position to (origin x + dy, origin y + dy),
+	// and return position that body moved to.
+	AddPosition(dx, dy int) (x, y int)
+
+	// Update body image data
 	UpdateBitmap(h, w int, image [][]uint8)
+
+	// Return the other bodies colliding with this body
 	GetCollided() []Body
 
+	// Return the bitmap witch added the position offset of this body
 	positionedBitmap() bitmap
 }
 
@@ -21,6 +34,7 @@ type body struct {
 	x, y int
 }
 
+// Create a new body and add it into the space
 func NewBody(s Space, t Type) Body {
 	b := &body{
 		id: s.nextID(),
@@ -43,7 +57,7 @@ func (b *body) SetPosition(x, y int) {
 	b.x = x
 	b.y = y
 }
-func (b *body) UpdatePosition(dx, dy int) (x, y int) {
+func (b *body) AddPosition(dx, dy int) (x, y int) {
 	b.x += dx
 	b.y += dy
 	return b.x, b.y

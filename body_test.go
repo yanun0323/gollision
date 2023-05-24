@@ -36,10 +36,10 @@ func TestSetPosition(t *testing.T) {
 	assert.Equal(t, 14, b.y)
 }
 
-func TestUpdatePosition(t *testing.T) {
+func TestAddPosition(t *testing.T) {
 	b := &body{x: 10, y: 10}
 	var bb Body = b
-	x, y := bb.UpdatePosition(13, 14)
+	x, y := bb.AddPosition(13, 14)
 	assert.Equal(t, 23, x)
 	assert.Equal(t, 23, b.x)
 	assert.Equal(t, 24, y)

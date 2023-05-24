@@ -106,7 +106,7 @@ func (su *GollisionSuite) TestIntegration() {
 
 	for _, tc := range testCases {
 		su.T().Run(tc.desc, func(t *testing.T) {
-			x, y := body1.UpdatePosition(tc.body1Dx, tc.body1Dy)
+			x, y := body1.AddPosition(tc.body1Dx, tc.body1Dy)
 			su.T().Logf("%s (%d, %d)", tc.desc, x, y)
 			sp.Update()
 			su.Equal(tc.expectCollidedCount[0], len(body1.GetCollided()), "img%d", 1)

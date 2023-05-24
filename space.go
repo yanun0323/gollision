@@ -7,12 +7,20 @@ import (
 )
 
 type Space interface {
+	// Calculate collision of all bodies in this space
 	Update()
+
+	// Get the other bodies colliding with the body which matches the input ID
 	GetCollided(id uint64) []Body
 
+	// Get the next usable ID
 	nextID() uint64
+
+	// Add a body into this space
 	addBody(b Body)
-	removeBody(id uint64, t Type)
+
+	// Remove a body from this space
+	removeBody(id uint64)
 }
 
 type idSet = gollection.Set[uint64]
@@ -64,7 +72,7 @@ func (s *space) addBody(b Body) {
 	s.bodyMap.Store(b.ID(), b)
 }
 
-func (s *space) removeBody(id uint64, t Type) {
+func (s *space) removeBody(id uint64) {
 	s.bodyMap.Delete(id)
 }
 
