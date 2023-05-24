@@ -50,6 +50,10 @@ func TestUpdateBitmap(t *testing.T) {
 	// TODO: Implement me
 }
 
+func TestIsCollided(t *testing.T) {
+	// TODO: Implement me
+}
+
 func TestGetCollided(t *testing.T) {
 	// TODO: Implement me
 }

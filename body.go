@@ -17,6 +17,9 @@ type Body interface {
 	// Update body image data
 	UpdateBitmap(h, w int, image [][]uint8)
 
+	// Return true if this body is colliding something
+	IsCollided() bool
+
 	// Return the other bodies colliding with this body
 	GetCollided() []Body
 
@@ -66,6 +69,10 @@ func (b *body) AddPosition(dx, dy int) (x, y int) {
 func (b *body) UpdateBitmap(h, w int, image [][]uint8) {
 	bm := newBitmap(h, w, image)
 	b.bm = bm
+}
+
+func (b *body) IsCollided() bool {
+	return b.s.IsCollided(b.id)
 }
 
 func (b *body) GetCollided() []Body {

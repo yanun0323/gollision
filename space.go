@@ -10,7 +10,10 @@ type Space interface {
 	// Calculate collision of all bodies in this space
 	Update()
 
-	// Get the other bodies colliding with the body which matches the input ID
+	// Return true if the body which matches the ID is colliding something
+	IsCollided(id uint64) bool
+
+	// Get the other bodies colliding with the body which matches the ID
 	GetCollided(id uint64) []Body
 
 	// Get the next usable ID
@@ -29,7 +32,7 @@ type space struct {
 	lastBodyIDLock sync.Mutex
 	lastBodyID     uint64
 
-	collidedMap map[uint64]idSet
+	collidedMap gollection.SyncMap[uint64, idSet]
 
 	bodyMap gollection.SyncMap[uint64, Body]
 }
@@ -38,7 +41,7 @@ func NewSpace() Space {
 	return &space{
 		lastBodyIDLock: sync.Mutex{},
 		lastBodyID:     0,
-		collidedMap:    map[uint64]idSet{},
+		collidedMap:    gollection.NewSyncMap[uint64, idSet](),
 		bodyMap:        gollection.NewSyncMap[uint64, Body](),
 	}
 }
@@ -47,8 +50,16 @@ func (s *space) Update() {
 	s.calculateCollided()
 }
 
+func (s *space) IsCollided(id uint64) bool {
+	m, ok := s.collidedMap.Load(id)
+	if !ok {
+		return false
+	}
+	return m.Len() != 0
+}
+
 func (s *space) GetCollided(id uint64) []Body {
-	m, ok := s.collidedMap[id]
+	m, ok := s.collidedMap.Load(id)
 	if !ok {
 		return []Body{}
 	}
@@ -77,7 +88,7 @@ func (s *space) removeBody(id uint64) {
 }
 
 func (s *space) calculateCollided() {
-	s.collidedMap = map[uint64]idSet{}
+	s.collidedMap = gollection.NewSyncMap[uint64, idSet]()
 	var queue []Body
 	s.bodyMap.Range(func(key uint64, b Body) bool {
 		queue = append(queue, b)
@@ -108,15 +119,17 @@ func (s *space) calculateCollided() {
 				continue
 			}
 
-			if s.collidedMap[aID] == nil {
-				s.collidedMap[aID] = gollection.NewSet[uint64]()
+			if v, ok := s.collidedMap.Load(aID); !ok || v == nil {
+				s.collidedMap.Store(aID, gollection.NewSet[uint64]())
 			}
-			s.collidedMap[aID].Insert(bID)
+			v, _ := s.collidedMap.Load(aID)
+			v.Insert(bID)
 
-			if s.collidedMap[bID] == nil {
-				s.collidedMap[bID] = gollection.NewSet[uint64]()
+			if v, ok := s.collidedMap.Load(bID); !ok || v == nil {
+				s.collidedMap.Store(bID, gollection.NewSet[uint64]())
 			}
-			s.collidedMap[bID].Insert(aID)
+			v, _ = s.collidedMap.Load(bID)
+			v.Insert(aID)
 		}
 	}
 }
