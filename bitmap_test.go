@@ -8,11 +8,11 @@ import (
 
 func TestNewBitmap_Good(t *testing.T) {
 	testCases := []struct {
-		Name           string
-		H, W           int
-		Data           [][]uint8
-		ExpectedLen    int
-		ExpectedValues []uint64
+		desc           string
+		h, w           int
+		data           [][]uint8
+		expectedLen    int
+		expectedValues []uint64
 	}{
 		{
 			"empty 1", 0, 0, [][]uint8{},
@@ -53,53 +53,24 @@ func TestNewBitmap_Good(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		bm, err := newBitmap(tc.H, tc.W, tc.Data)
-		assert.NoError(t, err, "test: %s, err: %+v", tc.Name, err)
-		assert.Equal(t, tc.ExpectedLen, len(bm.m), "test: %s, mismatch map length", tc.Name)
-		for i, expected := range tc.ExpectedValues {
-			assert.Equal(t, expected, bm.m[i], "test: %s, mismatch map value at %d, expected: %d, actual %d", tc.Name, i, expected, bm.m[i])
-		}
-	}
-}
-
-func TestNewBitmap_Error(t *testing.T) {
-	testCases := []struct {
-		Name string
-		H, W int
-		Data [][]uint8
-	}{
-		{
-			"height out of bounds", 5, 3, [][]uint8{
-				{0, 0, 0},
-				{0, 0, 1},
-				{0, 0, 255},
-			},
-		},
-		{
-			"width out of bounds", 3, 5, [][]uint8{
-				{0, 0, 0},
-				{0, 0, 1},
-				{0, 0, 255},
-			},
-		},
-		{
-			"empty 1", 3, 3, [][]uint8{},
-		},
-	}
-
-	for _, tc := range testCases {
-		_, err := newBitmap(tc.H, tc.W, tc.Data)
-		assert.Error(t, err, "test: %s no error", tc.Name)
+		t.Run(tc.desc, func(t *testing.T) {
+			t.Log(tc.desc)
+			bm := newBitmap(tc.h, tc.w, tc.data)
+			assert.Equal(t, tc.expectedLen, len(bm.m), "mismatch map length")
+			for i, expected := range tc.expectedValues {
+				assert.Equal(t, expected, bm.m[i], "mismatch map value at %d, expected: %d, actual %d", i, expected, bm.m[i])
+			}
+		})
 	}
 }
 
 func TestAnd_Good(t *testing.T) {
 	testCases := []struct {
-		Name     string
-		H, W     int
-		Data1    [][]uint8
-		Data2    [][]uint8
-		Expected []uint64
+		desc           string
+		h, w           int
+		data1          [][]uint8
+		data2          [][]uint8
+		expectedValues []uint64
 	}{
 		{
 			"full test",
@@ -123,26 +94,25 @@ func TestAnd_Good(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		bm1, err := newBitmap(tc.H, tc.W, tc.Data1)
-		assert.NoError(t, err, tc.Name)
-		bm2, err := newBitmap(tc.H, tc.W, tc.Data2)
-		assert.NoError(t, err, tc.Name)
-
-		bm := bm1.and(bm2)
-		for i, expected := range tc.Expected {
-			assert.Equal(t, expected, bm.m[i], "test: %s, mismatch map value at %d, expected: %d, actual %d", tc.Name, i, expected, bm.m[i])
-
-		}
+		t.Run(tc.desc, func(t *testing.T) {
+			t.Log(tc.desc)
+			bm1 := newBitmap(tc.h, tc.w, tc.data1)
+			bm2 := newBitmap(tc.h, tc.w, tc.data2)
+			bm := bm1.and(bm2)
+			for i, expected := range tc.expectedValues {
+				assert.Equal(t, expected, bm.m[i], "mismatch map value at %d, expected: %d, actual %d", i, expected, bm.m[i])
+			}
+		})
 	}
 }
 
 func TestOr_Good(t *testing.T) {
 	testCases := []struct {
-		Name     string
-		H, W     int
-		Data1    [][]uint8
-		Data2    [][]uint8
-		Expected []uint64
+		desc           string
+		h, w           int
+		data1          [][]uint8
+		data2          [][]uint8
+		expectedValues []uint64
 	}{
 		{
 			"full test",
@@ -166,15 +136,15 @@ func TestOr_Good(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		bm1, err := newBitmap(tc.H, tc.W, tc.Data1)
-		assert.NoError(t, err, tc.Name)
-		bm2, err := newBitmap(tc.H, tc.W, tc.Data2)
-		assert.NoError(t, err, tc.Name)
-
-		bm := bm1.or(bm2)
-		for i, expected := range tc.Expected {
-			assert.Equal(t, expected, bm.m[i], "test: %s, mismatch map value at %d, expected: %d, actual %d", tc.Name, i, expected, bm.m[i])
-		}
+		t.Run(tc.desc, func(t *testing.T) {
+			t.Log(tc.desc)
+			bm1 := newBitmap(tc.h, tc.w, tc.data1)
+			bm2 := newBitmap(tc.h, tc.w, tc.data2)
+			bm := bm1.or(bm2)
+			for i, expected := range tc.expectedValues {
+				assert.Equal(t, expected, bm.m[i], "mismatch map value at %d, expected: %d, actual %d", i, expected, bm.m[i])
+			}
+		})
 	}
 }
 
@@ -187,10 +157,10 @@ func TestOffset_Good(t *testing.T) {
 	h, w := len(data), len(data[0])
 
 	testCases := []struct {
-		Name           string
-		X, Y           int
-		Data           [][]uint8
-		ExpectedValues []uint64
+		desc           string
+		x, y           int
+		data           [][]uint8
+		expectedValues []uint64
 	}{
 		{
 			"move right",
@@ -210,7 +180,7 @@ func TestOffset_Good(t *testing.T) {
 		{
 			"move top",
 			0, -2, data,
-			[]uint64{16},
+			[]uint64{4},
 		},
 		{
 			"move top to empty",
@@ -220,17 +190,79 @@ func TestOffset_Good(t *testing.T) {
 		{
 			"move bottom",
 			0, 2, data,
-			[]uint64{0, 0, 4, 8, 16},
+			[]uint64{0, 0, 1, 2, 4},
 		},
 	}
 
 	for _, tc := range testCases {
-		bm, err := newBitmap(h, w, tc.Data)
-		assert.NoError(t, err, tc.Name)
-		moved := bm.offset(tc.X, tc.Y)
-		for i, expected := range tc.ExpectedValues {
-			assert.Equal(t, max(0, h+tc.Y), len(moved.m), tc.Name)
-			assert.Equal(t, expected, moved.m[i], "test: %s, mismatch map value at %d, expected: %d, actual %d", tc.Name, i, expected, moved.m[i])
-		}
+		t.Run(tc.desc, func(t *testing.T) {
+			t.Log(tc.desc)
+			bm := newBitmap(h, w, tc.data)
+			moved := bm.offset(tc.x, tc.y)
+			for i, expected := range tc.expectedValues {
+				assert.Equal(t, max(0, h+tc.y), len(moved.m))
+				assert.Equal(t, expected, moved.m[i], "mismatch map value at %d, expected: %d, actual %d", i, expected, moved.m[i])
+			}
+		})
+	}
+}
+
+func TestIsEmpty_Good(t *testing.T) {
+	testCases := []struct {
+		desc    string
+		h, w    int
+		data    [][]uint8
+		isEmpty bool
+	}{
+		{
+			"empty 1",
+			5, 5,
+			[][]uint8{},
+			true,
+		},
+		{
+			"empty 2",
+			0, 0,
+			[][]uint8{},
+			true,
+		},
+		{
+			"empty 3",
+			0, 0,
+			[][]uint8{{1, 2, 3}},
+			true,
+		},
+		{
+			"empty 4",
+			5, 0,
+			[][]uint8{{1, 2, 3}},
+			true,
+		},
+		{
+			"empty 5",
+			0, 5,
+			[][]uint8{{1, 2, 3}},
+			true,
+		},
+		{
+			"not empty 1",
+			2, 3,
+			[][]uint8{{1, 1, 1}, {1, 1, 1}},
+			false,
+		},
+		{
+			"not empty 2",
+			2, 2,
+			[][]uint8{{1, 1, 1}, {1, 1, 1}, {1, 1, 1}},
+			false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			t.Log(tc.desc)
+			bm := newBitmap(tc.h, tc.w, tc.data)
+			assert.Equal(t, tc.isEmpty, bm.isEmpty())
+		})
 	}
 }

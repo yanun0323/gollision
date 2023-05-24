@@ -5,7 +5,7 @@ type Body interface {
 	Type() Type
 	SetPosition(x, y int)
 	UpdatePosition(dx, dy int) (x, y int)
-	UpdateBitmap(h, w int, image [][]uint8) error
+	UpdateBitmap(h, w int, image [][]uint8)
 	GetCollided() []Body
 
 	positionedBitmap() bitmap
@@ -44,18 +44,14 @@ func (b *body) SetPosition(x, y int) {
 	b.y = y
 }
 func (b *body) UpdatePosition(dx, dy int) (x, y int) {
-	b.x = x + dx
-	b.y = y + dy
+	b.x += dx
+	b.y += dy
 	return b.x, b.y
 }
 
-func (b *body) UpdateBitmap(h, w int, image [][]uint8) error {
-	bm, err := newBitmap(h, w, image)
-	if err != nil {
-		return err
-	}
+func (b *body) UpdateBitmap(h, w int, image [][]uint8) {
+	bm := newBitmap(h, w, image)
 	b.bm = bm
-	return nil
 }
 
 func (b *body) GetCollided() []Body {

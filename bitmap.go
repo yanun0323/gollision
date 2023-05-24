@@ -1,30 +1,23 @@
 package gollision
 
-import "errors"
-
 type bitmap struct {
 	w, h  int
 	m     []uint64
 	empty bool
 }
 
-func newBitmap(h, w int, data [][]uint8) (bitmap, error) {
-	if h == 0 || w == 0 {
-		return bitmap{}, nil
-	}
-
-	if len(data) < h {
-		return bitmap{}, errors.New("height out of bounds")
-	}
-
-	if len(data) == 0 || len(data[0]) < w {
-		return bitmap{}, errors.New("width out of bounds")
+func newBitmap(h, w int, data [][]uint8) bitmap {
+	if w == 0 {
+		return bitmap{}
 	}
 
 	m := make([]uint64, h)
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
-			if data[y][x] == 0 {
+	for y, row := range data {
+		if y >= h {
+			continue
+		}
+		for x, value := range row {
+			if x >= w || value == 0 {
 				continue
 			}
 			m[y] |= uint64(1) << x
@@ -35,7 +28,7 @@ func newBitmap(h, w int, data [][]uint8) (bitmap, error) {
 		w: w,
 		h: h,
 		m: m,
-	}, nil
+	}
 }
 
 func (bm bitmap) and(in bitmap) bitmap {

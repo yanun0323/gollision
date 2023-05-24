@@ -14,26 +14,32 @@ func TestGollisionSuite(t *testing.T) {
 	suite.Run(t, new(GollisionSuite))
 }
 
-type Image struct {
-	W, H int
-	Data [][]uint8
+type image struct {
+	data [][]uint8
+}
+
+func (i image) w() int {
+	if len(i.data) == 0 {
+		return 0
+	}
+	return len(i.data[0])
+}
+
+func (i image) h() int {
+	return len(i.data)
 }
 
 var (
-	img1 = Image{
-		W: 3,
-		H: 3,
-		Data: [][]uint8{
+	img1 = image{
+		data: [][]uint8{
 			{0, 0, 0},
 			{0, 0, 0},
 			{0, 1, 0},
 		},
 	}
 
-	img2 = Image{
-		W: 5,
-		H: 5,
-		Data: [][]uint8{
+	img2 = image{
+		data: [][]uint8{
 			{0, 0, 0, 0, 0},
 			{0, 1, 1, 1, 0},
 			{0, 1, 0, 1, 0},
@@ -41,10 +47,8 @@ var (
 			{0, 0, 0, 0, 0},
 		},
 	}
-	img3 = Image{
-		W: 5,
-		H: 5,
-		Data: [][]uint8{
+	img3 = image{
+		data: [][]uint8{
 			{1, 0, 0, 0, 1},
 			{0, 1, 0, 1, 0},
 			{0, 0, 1, 0, 0},
@@ -55,23 +59,22 @@ var (
 )
 
 func (su *GollisionSuite) TestIntegration() {
-	return
 	sp := NewSpace()
 
 	player := Type(0)
 	monster := Type(1)
 
 	body1 := NewBody(sp, player)
-	su.Require().NoError(body1.UpdateBitmap(img1.H, img1.W, img1.Data))
+	body1.UpdateBitmap(img1.h(), img1.w(), img1.data)
 	body2 := NewBody(sp, monster)
-	su.Require().NoError(body2.UpdateBitmap(img2.H, img2.W, img2.Data))
+	body2.UpdateBitmap(img2.h(), img2.w(), img2.data)
 	body3 := NewBody(sp, monster)
-	su.Require().NoError(body3.UpdateBitmap(img3.H, img3.W, img3.Data))
+	body3.UpdateBitmap(img3.h(), img3.w(), img3.data)
 
 	testCases := []struct {
-		Name                   string
-		Body1MoveX, Body1MoveY int
-		ExpectCollidedCount    [3]int
+		desc                string
+		body1Dx, body1Dy    int
+		expectCollidedCount [3]int
 	}{
 		{
 			"Start",
@@ -101,10 +104,13 @@ func (su *GollisionSuite) TestIntegration() {
 	}
 
 	for _, tc := range testCases {
-		_, _ = body1.UpdatePosition(tc.Body1MoveX, tc.Body1MoveY)
-		sp.Update()
-		su.Equal(tc.ExpectCollidedCount[0], len(body1.GetCollided()), "%s: %d", tc.Name, 1)
-		su.Equal(tc.ExpectCollidedCount[1], len(body2.GetCollided()), "%s: %d", tc.Name, 2)
-		su.Equal(tc.ExpectCollidedCount[2], len(body3.GetCollided()), "%s: %d", tc.Name, 3)
+		su.T().Run(tc.desc, func(t *testing.T) {
+			x, y := body1.UpdatePosition(tc.body1Dx, tc.body1Dy)
+			su.T().Logf("%s (%d, %d)", tc.desc, x, y)
+			sp.Update()
+			su.Equal(tc.expectCollidedCount[0], len(body1.GetCollided()), "img%d", 1)
+			su.Equal(tc.expectCollidedCount[1], len(body2.GetCollided()), "img%d", 2)
+			su.Equal(tc.expectCollidedCount[2], len(body3.GetCollided()), "img%d", 3)
+		})
 	}
 }
