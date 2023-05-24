@@ -3,6 +3,7 @@ package gollision
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -112,5 +113,21 @@ func (su *GollisionSuite) TestIntegration() {
 			su.Equal(tc.expectCollidedCount[1], len(body2.GetCollided()), "img%d", 2)
 			su.Equal(tc.expectCollidedCount[2], len(body3.GetCollided()), "img%d", 3)
 		})
+	}
+}
+
+func TestToSlice(t *testing.T) {
+	bm := newBitmap(5, 3, [][]uint8{
+		{0, 0, 0},
+		{1, 0, 0},
+		{0, 1, 0},
+		{0, 0, 1},
+		{1, 1, 1},
+	})
+
+	sli := bm.toSlice()
+	expectedValues := []uint8{0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1}
+	for i, v := range sli {
+		assert.Equal(t, expectedValues[i], v)
 	}
 }
