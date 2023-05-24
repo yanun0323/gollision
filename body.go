@@ -24,7 +24,7 @@ type Body interface {
 	positionedBitmap() bitmap
 }
 
-type Type uint64
+type Type uint8
 
 type body struct {
 	id   uint64
