@@ -46,7 +46,11 @@ func TestAddPosition(t *testing.T) {
 	assert.Equal(t, 24, b.y)
 }
 
-func TestUpdateBitmap(t *testing.T) {
+func TestUpdateBitmapByImage(t *testing.T) {
+	// TODO: Implement me
+}
+
+func TestUpdateBitmapByAlpha(t *testing.T) {
 	// TODO: Implement me
 }
 
