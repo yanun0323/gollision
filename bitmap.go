@@ -6,7 +6,7 @@ type bitmap struct {
 	empty bool
 }
 
-func newBitmap(h, w int, data [][]uint8) *bitmap {
+func newBitmapByImage(h, w int, data [][]uint8) *bitmap {
 	if w == 0 {
 		return emptyBitmap()
 	}
@@ -18,6 +18,31 @@ func newBitmap(h, w int, data [][]uint8) *bitmap {
 		}
 		for x, value := range row {
 			if x >= w || value == 0 {
+				continue
+			}
+			m[y] |= uint64(1) << x
+		}
+	}
+
+	return &bitmap{
+		w: w,
+		h: h,
+		m: m,
+	}
+}
+
+func newBitmapByAlpha(h, w int, data [][]bool) *bitmap {
+	if w == 0 {
+		return emptyBitmap()
+	}
+
+	m := make([]uint64, h)
+	for y, row := range data {
+		if y >= h {
+			continue
+		}
+		for x, value := range row {
+			if x >= w || !value {
 				continue
 			}
 			m[y] |= uint64(1) << x

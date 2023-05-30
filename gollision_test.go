@@ -66,11 +66,11 @@ func (su *GollisionSuite) TestIntegration() {
 	monster := Type(1)
 
 	body1 := NewBody(sp, player)
-	body1.UpdateBitmap(img1.h(), img1.w(), img1.data)
+	body1.UpdateBitmapByImage(img1.h(), img1.w(), img1.data)
 	body2 := NewBody(sp, monster)
-	body2.UpdateBitmap(img2.h(), img2.w(), img2.data)
+	body2.UpdateBitmapByImage(img2.h(), img2.w(), img2.data)
 	body3 := NewBody(sp, monster)
-	body3.UpdateBitmap(img3.h(), img3.w(), img3.data)
+	body3.UpdateBitmapByImage(img3.h(), img3.w(), img3.data)
 
 	testCases := []struct {
 		desc                string
@@ -117,7 +117,7 @@ func (su *GollisionSuite) TestIntegration() {
 }
 
 func TestToSlice(t *testing.T) {
-	bm := newBitmap(5, 3, [][]uint8{
+	bm := newBitmapByImage(5, 3, [][]uint8{
 		{0, 0, 0},
 		{1, 0, 0},
 		{0, 1, 0},

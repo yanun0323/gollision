@@ -55,7 +55,7 @@ func TestNewBitmap_Good(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Log(tc.desc)
-			bm := newBitmap(tc.h, tc.w, tc.data)
+			bm := newBitmapByImage(tc.h, tc.w, tc.data)
 			assert.Equal(t, tc.expectedLen, len(bm.m), "mismatch map length")
 			for i, expected := range tc.expectedValues {
 				assert.Equal(t, expected, bm.m[i], "mismatch map value at %d, expected: %d, actual %d", i, expected, bm.m[i])
@@ -96,8 +96,8 @@ func TestAnd_Good(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Log(tc.desc)
-			bm1 := newBitmap(tc.h, tc.w, tc.data1)
-			bm2 := newBitmap(tc.h, tc.w, tc.data2)
+			bm1 := newBitmapByImage(tc.h, tc.w, tc.data1)
+			bm2 := newBitmapByImage(tc.h, tc.w, tc.data2)
 			bm := bm1.and(bm2)
 			for i, expected := range tc.expectedValues {
 				assert.Equal(t, expected, bm.m[i], "mismatch map value at %d, expected: %d, actual %d", i, expected, bm.m[i])
@@ -138,8 +138,8 @@ func TestOr_Good(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Log(tc.desc)
-			bm1 := newBitmap(tc.h, tc.w, tc.data1)
-			bm2 := newBitmap(tc.h, tc.w, tc.data2)
+			bm1 := newBitmapByImage(tc.h, tc.w, tc.data1)
+			bm2 := newBitmapByImage(tc.h, tc.w, tc.data2)
 			bm := bm1.or(bm2)
 			for i, expected := range tc.expectedValues {
 				assert.Equal(t, expected, bm.m[i], "mismatch map value at %d, expected: %d, actual %d", i, expected, bm.m[i])
@@ -197,7 +197,7 @@ func TestOffset_Good(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Log(tc.desc)
-			bm := newBitmap(h, w, tc.data)
+			bm := newBitmapByImage(h, w, tc.data)
 			moved := bm.offset(tc.x, tc.y)
 			for i, expected := range tc.expectedValues {
 				assert.Equal(t, max(0, h+tc.y), len(moved.m))
@@ -261,7 +261,7 @@ func TestIsEmpty_Good(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Log(tc.desc)
-			bm := newBitmap(tc.h, tc.w, tc.data)
+			bm := newBitmapByImage(tc.h, tc.w, tc.data)
 			assert.Equal(t, tc.isEmpty, bm.isEmpty())
 		})
 	}

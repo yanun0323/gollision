@@ -15,7 +15,10 @@ type Body interface {
 	AddPosition(dx, dy int) (x, y int)
 
 	// Update body image data
-	UpdateBitmap(h, w int, image [][]uint8)
+	UpdateBitmapByImage(h, w int, image [][]uint8)
+
+	// Update body alpha data
+	UpdateBitmapByAlpha(h, w int, image [][]bool)
 
 	// Return true if this body is colliding something
 	IsCollided() bool
@@ -66,8 +69,13 @@ func (b *body) AddPosition(dx, dy int) (x, y int) {
 	return b.x, b.y
 }
 
-func (b *body) UpdateBitmap(h, w int, image [][]uint8) {
-	bm := newBitmap(h, w, image)
+func (b *body) UpdateBitmapByImage(h, w int, image [][]uint8) {
+	bm := newBitmapByImage(h, w, image)
+	b.bm = bm
+}
+
+func (b *body) UpdateBitmapByAlpha(h, w int, image [][]bool) {
+	bm := newBitmapByAlpha(h, w, image)
 	b.bm = bm
 }
 
