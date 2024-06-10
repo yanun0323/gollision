@@ -14,6 +14,9 @@ type Body interface {
 	// and return position that body moved to.
 	AddPosition(dx, dy int) (x, y int)
 
+	// Boundary gets the size of collision body
+	Boundary() (w, h int)
+
 	// Update body image data
 	UpdateBitmapByImage(h, w int, image [][]uint8)
 
@@ -59,10 +62,16 @@ func (b body) ID() uint64 {
 func (b body) Type() Type {
 	return b.t
 }
+
+func (b body) Boundary() (w, h int) {
+	return b.bm.w, b.bm.h
+}
+
 func (b *body) SetPosition(x, y int) {
 	b.x = x
 	b.y = y
 }
+
 func (b *body) AddPosition(dx, dy int) (x, y int) {
 	b.x += dx
 	b.y += dy
