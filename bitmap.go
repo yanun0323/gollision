@@ -61,6 +61,10 @@ func emptyBitmap() *bitmap {
 }
 
 func (bm *bitmap) and(in *bitmap) *bitmap {
+	if bm == nil {
+		return nil
+	}
+
 	minH := min(bm.h, in.h)
 	m := make([]uint64, minH)
 	for i := 0; i < minH; i++ {
@@ -74,6 +78,10 @@ func (bm *bitmap) and(in *bitmap) *bitmap {
 }
 
 func (bm *bitmap) or(in *bitmap) *bitmap {
+	if bm == nil {
+		return nil
+	}
+
 	higher := in
 	if in.h > bm.h {
 		higher = bm
@@ -97,6 +105,10 @@ func (bm *bitmap) or(in *bitmap) *bitmap {
 }
 
 func (bm *bitmap) offset(x, y int) *bitmap {
+	if bm == nil {
+		return nil
+	}
+
 	w := bm.w + x
 	h := bm.h + y
 	if w <= 0 || h <= 0 {
@@ -125,6 +137,10 @@ func (bm *bitmap) offset(x, y int) *bitmap {
 }
 
 func (bm *bitmap) isEmpty() bool {
+	if bm == nil {
+		return true
+	}
+
 	if bm.empty {
 		return true
 	}
