@@ -64,7 +64,13 @@ func (b body) Type() Type {
 }
 
 func (b body) Boundary() (w, h int) {
-	return b.bm.w, b.bm.h
+	width, height := 0, 0
+	if b.bm != nil {
+		width = b.bm.w
+		height = b.bm.h
+	}
+
+	return width, height
 }
 
 func (b *body) SetPosition(x, y int) {
